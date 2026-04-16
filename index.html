@@ -314,8 +314,15 @@ tfoot tr{background:var(--s2);}tfoot td{padding:9px 10px;font-weight:700;}
   </div>
 
   <div class="stitle">Historique</div>
-  <div class="tw"><table>
-    <thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Total</th><th>Pay.</th><th></th></tr></thead>
+  <div class="tw"><table style="table-layout:fixed;width:100%">
+    <colgroup>
+      <col style="width:52px">
+      <col style="width:42px">
+      <col style="width:auto">
+      <col style="width:80px">
+      <col style="width:110px">
+    </colgroup>
+    <thead><tr><th>N°</th><th>Date</th><th>Client</th><th>Total</th><th style="text-align:right">Actions</th></tr></thead>
     <tbody id="tb-vt"></tbody>
   </table></div>
 </div>
@@ -391,8 +398,15 @@ tfoot tr{background:var(--s2);}tfoot td{padding:9px 10px;font-weight:700;}
   </div>
 
   <div class="stitle">Historique</div>
-  <div class="tw"><table>
-    <thead><tr><th>N°</th><th>Date</th><th>Fourn.</th><th>Total</th><th>Pay.</th><th></th></tr></thead>
+  <div class="tw"><table style="table-layout:fixed;width:100%">
+    <colgroup>
+      <col style="width:52px">
+      <col style="width:42px">
+      <col style="width:auto">
+      <col style="width:80px">
+      <col style="width:70px">
+    </colgroup>
+    <thead><tr><th>N°</th><th>Date</th><th>Fourn.</th><th>Total</th><th style="text-align:right">Actions</th></tr></thead>
     <tbody id="tb-at"></tbody>
   </table></div>
 </div>
@@ -1485,48 +1499,45 @@ function viewFournHistory(fid){
 // ════════ RENDER ═════════════════════════════════════════════
 function rVt(){
   var tb=document.getElementById('tb-vt');if(!tb)return;
-  if(!DB.ventes.length){tb.innerHTML='<tr><td colspan="6"><div class="empty">Aucun bon</div></td></tr>';return;}
+  if(!DB.ventes.length){tb.innerHTML='<tr><td colspan="5"><div class="empty">Aucun bon</div></td></tr>';return;}
   tb.innerHTML=DB.ventes.slice().reverse().map(function(v,i){
     var ri=DB.ventes.length-1-i;
     var ls=v.lignes||[];
-    var nbArt=ls.length;
     var reste=v.paiement==='cash'?0:v.total-(v.paye||0);
     return '<tr>'
-      +'<td><span class="bd t-bd">'+v.id+'</span><div style="font-size:10px;color:#6b7280">'+v.date.slice(5)+'</div></td>'
-      +'<td style="max-width:80px"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.clientNom+'</div>'
-      +'<div style="font-size:10px;color:#6b7280">'+nbArt+' article(s)</div></td>'
-      +'<td><div class="mono" style="color:#00c9a7;font-weight:700">'+f3(v.total)+' DT</div>'
-      +(reste>0.001?'<div style="color:#f87171;font-size:10px">Reste: '+f3(reste)+'</div>':'<div style="color:#4ade80;font-size:10px">Solde</div>')
-      +payB(v.paiement)+'</td>'
-      +'<td><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">'
-      +'<button class="ebtn" style="color:#60a5fa" onclick="viewVente('+ri+')" title="Voir">👁️</button>'
-      +'<button class="ebtn" style="color:#00c9a7" onclick="impB('+ri+')" title="Imprimer">🖨️</button>'
-      +'<button class="ebtn" style="color:#fbbf24" onclick="editVente('+ri+')" title="Modifier">✏️</button>'
-      +'<button class="del" onclick="dV('+ri+')" title="Supprimer">🗑</button>'
+      +'<td style="white-space:nowrap"><span class="bd t-bd" style="font-size:10px">'+v.id+'</span></td>'
+      +'<td style="white-space:nowrap;font-size:11px;color:var(--dm)">'+v.date.slice(5)+'</td>'
+      +'<td><div style="font-weight:600;font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+v.clientNom+'</div>'
+      +'<div style="font-size:10px;color:var(--dm)">'+ls.length+' art.</div></td>'
+      +'<td style="white-space:nowrap"><div class="mono" style="color:var(--tl);font-weight:700;font-size:12px">'+f3(v.total)+'</div>'
+      +(reste>0.001?'<div style="color:var(--rd);font-size:10px">-'+f3(reste)+'</div>':'')+payB(v.paiement)+'</td>'
+      +'<td><div style="display:flex;gap:3px;justify-content:flex-end">'
+      +'<button class="ebtn" style="color:#60a5fa;padding:3px 5px" onclick="viewVente('+ri+')">👁️</button>'
+      +'<button class="ebtn" style="color:#00c9a7;padding:3px 5px" onclick="impB('+ri+')">🖨️</button>'
+      +'<button class="ebtn" style="color:#fbbf24;padding:3px 5px" onclick="editVente('+ri+')">✏️</button>'
+      +'<button class="del" style="padding:3px 5px" onclick="dV('+ri+')">🗑</button>'
       +'</div></td></tr>';
   }).join('');
 }
 
 function rAt(){
   var tb=document.getElementById('tb-at');if(!tb)return;
-  if(!DB.achats.length){tb.innerHTML='<tr><td colspan="6"><div class="empty">Aucun achat</div></td></tr>';return;}
+  if(!DB.achats.length){tb.innerHTML='<tr><td colspan="5"><div class="empty">Aucun achat</div></td></tr>';return;}
   tb.innerHTML=DB.achats.slice().reverse().map(function(a,i){
     var ri=DB.achats.length-1-i;
     var ls=a.lignes||[];
-    var nbArt=ls.length;
     var reste=a.paiement==='cash'?0:a.total-(a.paye||0);
     return '<tr>'
-      +'<td><span class="bd o-bd">'+a.id+'</span><div style="font-size:10px;color:#6b7280">'+a.date.slice(5)+'</div></td>'
-      +'<td style="max-width:80px"><div style="font-weight:600;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+a.fournNom+'</div>'
-      +'<div style="font-size:10px;color:#6b7280">'+nbArt+' produit(s)</div></td>'
-      +'<td><div class="mono" style="color:#ff8c42;font-weight:700">'+f3(a.total)+' DT</div>'
-      +(reste>0.001?'<div style="color:#f87171;font-size:10px">Reste: '+f3(reste)+'</div>':'<div style="color:#4ade80;font-size:10px">Solde</div>')
-      +payB(a.paiement)+'</td>'
-      +'<td><div style="display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end">'
-      +'<button class="ebtn" style="color:#60a5fa" onclick="viewAchat('+ri+')" title="Voir">👁️</button>'
-      +'<button class="del" onclick="dA('+ri+')" title="Supprimer">🗑</button>'
-      +'</div></td>'
-      +'</tr>';
+      +'<td style="white-space:nowrap"><span class="bd o-bd" style="font-size:10px">'+a.id+'</span></td>'
+      +'<td style="white-space:nowrap;font-size:11px;color:var(--dm)">'+a.date.slice(5)+'</td>'
+      +'<td><div style="font-weight:600;font-size:12px;max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+a.fournNom+'</div>'
+      +'<div style="font-size:10px;color:var(--dm)">'+ls.length+' prod.</div></td>'
+      +'<td style="white-space:nowrap"><div class="mono" style="color:var(--or);font-weight:700;font-size:12px">'+f3(a.total)+'</div>'
+      +(reste>0.001?'<div style="color:var(--rd);font-size:10px">-'+f3(reste)+'</div>':'')+payB(a.paiement)+'</td>'
+      +'<td><div style="display:flex;gap:3px;justify-content:flex-end">'
+      +'<button class="ebtn" style="color:#60a5fa;padding:3px 5px" onclick="viewAchat('+ri+')">👁️</button>'
+      +'<button class="del" style="padding:3px 5px" onclick="dA('+ri+')">🗑</button>'
+      +'</div></td></tr>';
   }).join('');
 }
 
